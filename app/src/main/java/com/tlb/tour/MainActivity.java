@@ -48,7 +48,6 @@ public class MainActivity extends Activity {
         root.setPadding(18, 18, 18, 18);
         root.setBackgroundColor(Color.rgb(245, 248, 255));
 
-        // APP LOGO
         ImageView logo = new ImageView(this);
         logo.setImageResource(R.drawable.tlb_tour_logo);
         logo.setAdjustViewBounds(true);
@@ -63,7 +62,6 @@ public class MainActivity extends Activity {
         logoParams.gravity = Gravity.CENTER;
         root.addView(logo, logoParams);
 
-        // TITLE
         TextView head = title("👑 TLB TOUR", 28);
         head.setGravity(Gravity.CENTER);
         head.setBackgroundColor(blue);
@@ -77,12 +75,22 @@ public class MainActivity extends Activity {
         sub.setPadding(10, 22, 10, 22);
         root.addView(sub);
 
+        TextView balance = new TextView(this);
+        balance.setText("💰 Wallet Balance\n৳ 0.00");
+        balance.setTextSize(20);
+        balance.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        balance.setTextColor(Color.WHITE);
+        balance.setGravity(Gravity.CENTER);
+        balance.setPadding(10, 22, 10, 22);
+        balance.setBackgroundColor(Color.rgb(20, 150, 90));
+        root.addView(balance);
+
         TextView live = new TextView(this);
         live.setText("🔴 LIVE TOURNAMENTS");
         live.setTextSize(20);
         live.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         live.setTextColor(blue);
-        live.setPadding(8, 12, 8, 8);
+        live.setPadding(8, 18, 8, 8);
         root.addView(live);
 
         String[] items = {
@@ -104,4 +112,4 @@ public class MainActivity extends Activity {
         scroll.addView(root);
         setContentView(scroll);
     }
-                     }
+    }
