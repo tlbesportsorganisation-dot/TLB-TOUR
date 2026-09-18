@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "520030965363",
+    "project_id": "tlb-esports-tour",
+    "storage_bucket": "tlb-esports-tour.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520030965363:android:b7bd5214871626f9b02406",
+        "android_client_info": {
+          "package_name": "com.tlb.tour"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWlGFNBHRGFhU7c7Xm1Q8p3K0qznU80Wc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520030965363:android:b6d281d3f122f4b1b02406",
+        "android_client_info": {
+          "package_name": "com.tlb.tournament"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWlGFNBHRGFhU7c7Xm1Q8p3K0qznU80Wc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
