@@ -17,7 +17,9 @@ jobs:
       - name: Extract project
         run: |
           unzip -o TLB-TOUR-project.zip -d extracted
-          cp -R extracted/TLB-TOUR/. .
+
+          rsync -a --exclude='.github/' extracted/TLB-TOUR/ ./
+
           rm -rf extracted
           rm -f TLB-TOUR-project.zip
 
@@ -25,6 +27,9 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add .
+
           git commit -m "Extract TLB TOUR project files" || echo "No changes to commit"
+
           git push
