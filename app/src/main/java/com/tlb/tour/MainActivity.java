@@ -4,38 +4,56 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.InputType;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.*;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends Activity {
 
-    int blue = Color.rgb(25, 88, 220);
-    LinearLayout root;
+    private final int blue = Color.rgb(25, 88, 220);
+    private final int green = Color.rgb(20, 150, 90);
+
+    private LinearLayout root;
+    private FirebaseAuth auth;
+    private FirebaseFirestore db;
 
     @Override
-    public void onCreate(Bundle b) {
-        super.onCreate(b);
-        showLogin();
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        if (auth.getCurrentUser() != null) {
+            showHome();
+        } else {
+            showLogin();
+        }
     }
 
-    TextView text(String s, int size) {
+    private TextView text(String value, int size) {
         TextView t = new TextView(this);
-        t.setText(s);
+        t.setText(value);
         t.setTextSize(size);
         t.setTextColor(Color.DKGRAY);
         t.setPadding(10, 12, 10, 12);
         return t;
     }
 
-    Button button(String s) {
+    private Button button(String value) {
         Button b = new Button(this);
-        b.setText(s);
+        b.setText(value);
         b.setAllCaps(false);
         return b;
     }
 
-    void baseLayout() {
+    private void baseLayout() {
         ScrollView scroll = new ScrollView(this);
 
         root = new LinearLayout(this);
@@ -48,8 +66,7 @@ public class MainActivity extends Activity {
         setContentView(scroll);
     }
 
-    void showLogin() {
-
+    private void showLogin() {
         baseLayout();
 
         TextView title = text("👑 TLB TOUR", 30);
@@ -64,12 +81,18 @@ public class MainActivity extends Activity {
 
         EditText email = new EditText(this);
         email.setHint("Email");
-        email.setInputType(33);
+        email.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        );
         root.addView(email);
 
         EditText password = new EditText(this);
         password.setHint("Password");
-        password.setInputType(129);
+        password.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PASSWORD
+        );
         root.addView(password);
 
         Button login = button("🔐 Login");
@@ -83,26 +106,57 @@ public class MainActivity extends Activity {
         root.addView(info);
 
         login.setOnClickListener(v -> {
+            String emailText = email.getText().toString().trim();
+            String passwordText = password.getText().toString();
 
-            if (email.getText().toString().trim().isEmpty()
-                    || password.getText().toString().trim().isEmpty()) {
-
+            if (emailText.isEmpty() || passwordText.isEmpty()) {
                 Toast.makeText(
                         this,
-                        "Email and Password দিন",
+                        "Email এবং Password দিন",
                         Toast.LENGTH_SHORT
                 ).show();
-
-            } else {
-                showHome();
+                return;
             }
+
+            login.setEnabled(false);
+            Toast.makeText(
+                    this,
+                    "Login হচ্ছে...",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            auth.signInWithEmailAndPassword(
+                    emailText,
+                    passwordText
+            ).addOnCompleteListener(task -> {
+                login.setEnabled(true);
+
+                if (task.isSuccessful()) {
+                    Toast.makeText(
+                            this,
+                            "Login সফল হয়েছে",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    showHome();
+                } else {
+                    String message = task.getException() != null
+                            ? task.getException().getMessage()
+                            : "Login ব্যর্থ হয়েছে";
+
+                    Toast.makeText(
+                            this,
+                            message,
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            });
         });
 
         register.setOnClickListener(v -> showRegister());
     }
 
-    void showRegister() {
-
+    private void showRegister() {
         baseLayout();
 
         TextView title = text("📝 Create Account", 28);
@@ -121,22 +175,31 @@ public class MainActivity extends Activity {
 
         EditText email = new EditText(this);
         email.setHint("Email");
-        email.setInputType(33);
+        email.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        );
         root.addView(email);
 
         EditText phone = new EditText(this);
         phone.setHint("Phone Number");
-        phone.setInputType(2);
+        phone.setInputType(InputType.TYPE_CLASS_PHONE);
         root.addView(phone);
 
         EditText password = new EditText(this);
         password.setHint("Password");
-        password.setInputType(129);
+        password.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PASSWORD
+        );
         root.addView(password);
 
         EditText confirm = new EditText(this);
         confirm.setHint("Confirm Password");
-        confirm.setInputType(129);
+        confirm.setInputType(
+                InputType.TYPE_CLASS_TEXT |
+                InputType.TYPE_TEXT_VARIATION_PASSWORD
+        );
         root.addView(confirm);
 
         EditText referral = new EditText(this);
@@ -150,11 +213,18 @@ public class MainActivity extends Activity {
         root.addView(back);
 
         create.setOnClickListener(v -> {
+            String nameText = name.getText().toString().trim();
+            String usernameText = username.getText().toString().trim();
+            String emailText = email.getText().toString().trim();
+            String phoneText = phone.getText().toString().trim();
+            String passwordText = password.getText().toString();
+            String confirmText = confirm.getText().toString();
+            String referralText = referral.getText().toString().trim();
 
-            if (name.getText().toString().trim().isEmpty()
-                    || username.getText().toString().trim().isEmpty()
-                    || email.getText().toString().trim().isEmpty()
-                    || password.getText().toString().trim().isEmpty()) {
+            if (nameText.isEmpty()
+                    || usernameText.isEmpty()
+                    || emailText.isEmpty()
+                    || passwordText.isEmpty()) {
 
                 Toast.makeText(
                         this,
@@ -162,32 +232,104 @@ public class MainActivity extends Activity {
                         Toast.LENGTH_SHORT
                 ).show();
 
-            } else if (!password.getText().toString()
-                    .equals(confirm.getText().toString())) {
+                return;
+            }
 
+            if (!passwordText.equals(confirmText)) {
                 Toast.makeText(
                         this,
                         "Password মিলছে না",
                         Toast.LENGTH_SHORT
                 ).show();
 
-            } else {
+                return;
+            }
 
+            if (passwordText.length() < 6) {
                 Toast.makeText(
                         this,
-                        "Account তৈরি হচ্ছে...",
+                        "Password কমপক্ষে 6 অক্ষরের হতে হবে",
                         Toast.LENGTH_SHORT
                 ).show();
 
-                showHome();
+                return;
             }
+
+            create.setEnabled(false);
+
+            Toast.makeText(
+                    this,
+                    "Account তৈরি হচ্ছে...",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+            auth.createUserWithEmailAndPassword(
+                    emailText,
+                    passwordText
+            ).addOnCompleteListener(task -> {
+
+                if (!task.isSuccessful()) {
+                    create.setEnabled(true);
+
+                    String message = task.getException() != null
+                            ? task.getException().getMessage()
+                            : "Account তৈরি করা যায়নি";
+
+                    Toast.makeText(
+                            this,
+                            message,
+                            Toast.LENGTH_LONG
+                    ).show();
+
+                    return;
+                }
+
+                String uid = auth.getCurrentUser().getUid();
+
+                Map<String, Object> user = new HashMap<>();
+
+                user.put("uid", uid);
+                user.put("name", nameText);
+                user.put("username", usernameText);
+                user.put("email", emailText);
+                user.put("phone", phoneText);
+                user.put("referralCode", referralText);
+                user.put("walletBalance", 0.0);
+                user.put("createdAt", System.currentTimeMillis());
+
+                db.collection("users")
+                        .document(uid)
+                        .set(user)
+                        .addOnCompleteListener(saveTask -> {
+
+                            create.setEnabled(true);
+
+                            if (saveTask.isSuccessful()) {
+                                Toast.makeText(
+                                        this,
+                                        "Account সফলভাবে তৈরি হয়েছে",
+                                        Toast.LENGTH_SHORT
+                                ).show();
+
+                                showHome();
+
+                            } else {
+                                Toast.makeText(
+                                        this,
+                                        "Account হয়েছে, কিন্তু Profile data save হয়নি",
+                                        Toast.LENGTH_LONG
+                                ).show();
+
+                                showHome();
+                            }
+                        });
+            });
         });
 
         back.setOnClickListener(v -> showLogin());
     }
 
-    void showHome() {
-
+    private void showHome() {
         baseLayout();
 
         TextView title = text("👑 TLB TOUR", 30);
@@ -201,6 +343,7 @@ public class MainActivity extends Activity {
                 "FREE FIRE TOURNAMENT\nLive • Fair • Competitive",
                 18
         );
+
         sub.setGravity(Gravity.CENTER);
         root.addView(sub);
 
@@ -208,14 +351,27 @@ public class MainActivity extends Activity {
                 "💰 Wallet Balance\n৳ 0.00",
                 20
         );
-        balance.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+
+        balance.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
         balance.setTextColor(Color.WHITE);
         balance.setGravity(Gravity.CENTER);
-        balance.setBackgroundColor(Color.rgb(20, 150, 90));
+        balance.setBackgroundColor(green);
         root.addView(balance);
 
-        TextView live = text("🔴 LIVE TOURNAMENTS", 20);
-        live.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        TextView live = text(
+                "🔴 LIVE TOURNAMENTS",
+                20
+        );
+
+        live.setTypeface(
+                Typeface.DEFAULT,
+                Typeface.BOLD
+        );
+
         live.setTextColor(blue);
         root.addView(live);
 
@@ -232,17 +388,26 @@ public class MainActivity extends Activity {
                 "⚙️ Admin Panel"
         };
 
-        for (String s : items) {
-            Button b = button(s);
+        for (String item : items) {
+            Button b = button(item);
+
             root.addView(b);
 
             b.setOnClickListener(v ->
                     Toast.makeText(
                             this,
-                            s + " — Coming Next",
+                            item + " — Coming Next",
                             Toast.LENGTH_SHORT
                     ).show()
             );
         }
+
+        Button logout = button("🚪 Logout");
+        root.addView(logout);
+
+        logout.setOnClickListener(v -> {
+            auth.signOut();
+            showLogin();
+        });
     }
-            }
+        }
